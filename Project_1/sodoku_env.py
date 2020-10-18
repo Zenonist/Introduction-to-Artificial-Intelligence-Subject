@@ -6,16 +6,30 @@ from gym import spaces, multi_discrete, tuples
 def checkcondition(grid, x, y):
     error_location = []
     col_array = grid[:, x]
+    #check the condidtion in col
     if len(col_array) > len(set(col_array)):
         for row in range(0,8):
             if grid[x][y] == grid[row]:
                 error_location.append([x,row])
+    #check the condition in row
     row_array = grid[y, :]
     if len(row_array) > len(set(row_array)):
         for col in range(0,8):
             if grid[x][y] == grid[col]:
                 error_location.append([col,y])
-            
+    #check the condition in square
+    # * Use mod to remove remainder
+    posX = (x // 3) * 3
+    posY = (y // 3) * 3
+    # ! The posX & posY need to increase by 1 to get specific index [Block]
+    square_array = grid[posX:, posY:]
+    # Convert 2D into 1D array
+    temp_array = np.array(square_array) # Convert normal list into narray
+    oneD_array = temp_array.flatten()
+    if len(oneD_array) > len(set(row_array)):
+        for ax in range(0,8):
+            if grid[x][y] == grid[ax]:
+                error_location.append([((ax // 3) % 3) - 1,ax // 3])
     return error_location
     
 def GenerateGrid():
