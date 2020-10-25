@@ -1,7 +1,5 @@
-import gym
 import numpy as np
 import random
-from gym import spaces, multi_discrete, tuples
 
 def checkcondition(grid, x, y):
     error_location = []
@@ -49,13 +47,58 @@ def GenerateGrid():
                 while len(checkcondition(grid, row, random_position)) > 0:
                     grid[row][random_position] = random.randint(0,9)
                 list_location.append(random_position)
+    return grid
             
         
-class SodukuEnv(gym.Env):
-    metadata = {'render.modes': ['human']}
+class SodokuEnv:
 
-    
     def __init__(self):
-        #self.observation_space = spaces.Box(low = 1, high = 9 , shape = (9,9), dtype=np.int8)
-        self.current_grid = np.zeros(shape=(9,9))
-        self.current_assigned = 0
+        self.OriginalGrid = GenerateGrid()
+        self.Grid = self.OriginalGrid
+
+    def successors(self,num,x,y):
+        currentgrid = self.Grid
+        currentgrid[x][y] = num
+        error_location = checkcondition(currentgrid,x,y)
+        return error_location
+
+    def update(self, n, x, y):
+        if self.Grid[x][y] == 0:
+            self.Grid[x][y] = n
+            return True
+        else:
+            return False
+
+    def printBoard(self):
+        for i in range(9):
+            if (i % 3 == 0):
+                    print("-------------------------")
+            for j in range(9):
+                if (j % 3 == 0):
+                    print("|", end=" ")
+                print(self.board[i][j], end=" ")
+
+            print("|",i,"\n", end="")
+        print("-------------------------")
+
+    def returnBoard(self):
+        return self.Grid
+
+    def returnEmptyvaluePosition(self):
+        Positionlist = []
+        for i in range(9):
+            for j in range(9):
+                if self.Grid[i][j] == 0:
+                    Positionlist.append([i, j])
+        return Positionlist
+
+    def checkGoal(self):
+        count = 0
+        for x in range(9):
+            for y in range(9):
+                if self.Grid[x][y] != 0:
+                    count += 1
+        if count == 81:
+            return True
+        else:
+            return False
